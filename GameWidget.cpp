@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "game/EnergyView.h"
-#include "game/LogView.h"
 #include "game/MazeModel.h"
 #include "game/RobotModel.h"
 
@@ -22,7 +21,7 @@ GameWidget::GameWidget(QString name, QWidget *parent)
     m_mazeView   = new MazeView(m_mazeModel->getMazeModel());
     m_levelView  = new LCDView(m_mazeModel->getMazeModel());
     m_scoreView  = new LCDView(m_robotModel->getModel());
-    m_logView    = new LogView(m_robotModel->getModel());
+
 
     this->setStyleSheet("QWidget {background-color: black; color: WHITE;}");
 
@@ -47,7 +46,7 @@ GameWidget::GameWidget(QString name, QWidget *parent)
     connect(m_robotModel, SIGNAL(modelChanged(Robot::Model)),m_controller,SLOT(updateRobotModel(Robot::Model)));
     connect(m_robotModel, SIGNAL(modelChanged(Robot::Model)),m_robotView, SLOT(updateModel(Robot::Model)));
     connect(m_robotModel, SIGNAL(modelChanged(Robot::Model)),m_scoreView, SLOT(updateModel(Robot::Model)));
-    connect(m_robotModel, SIGNAL(modelChanged(Robot::Model)),m_logView,   SLOT(updateModel(Robot::Model)));
+
 
     //********* m_robotView sender *************
     connect(m_robotView, SIGNAL(keyHandled(int)), m_controller, SLOT(keyEventAction(int)));
@@ -82,13 +81,11 @@ GameWidget::GameWidget(QString name, QWidget *parent)
     auto *layout = new QGridLayout;
     layout->addWidget(createLabel( m_robotModel->getModel().name + " ENERGY"), 0, 0, 2, 1);
     layout->addWidget(m_energyView,2,0,3,1);
-    layout->addWidget(createLabel( "STATE LOG"), 0, 1, 2, 1);
-    layout->addWidget(m_logView,2,1,3,1, Qt::AlignHCenter);
-    layout->addWidget(createLabel("LEVEL"), 0, 2, 2, 1);
-    layout->addWidget(m_levelView, 2, 2, 3, 1);
-    layout->addWidget(createLabel("SCORE"), 0, 3, 2, 1);
-    layout->addWidget(m_scoreView, 2, 3, 3, 1);
-    layout->addLayout(gameLay, 6, 0, 20, 4);
+    layout->addWidget(createLabel("LEVEL"), 0, 1, 2, 1);
+    layout->addWidget(m_levelView, 2, 1, 3, 1);
+    layout->addWidget(createLabel("SCORE"), 0, 2, 2, 1);
+    layout->addWidget(m_scoreView, 2, 2, 3, 1);
+    layout->addLayout(gameLay, 6, 0, 20, 3);
 
 
     setLayout(layout);

@@ -24,10 +24,10 @@ MazeView::~MazeView()=default;
 void MazeView::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event)
 
-    QStyleOption opt;
-    opt.initFrom(this);
-    QPainter p(this);
-    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+//    QStyleOption opt;
+//    opt.initFrom(this);
+//    QPainter p(this);
+//    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 
     drawMaze();
     drawTarget();
@@ -36,8 +36,8 @@ void MazeView::paintEvent(QPaintEvent *event) {
 
 void MazeView::drawMaze(){
     QPainter qp(this);
-    for(auto &w:qAsConst(m_viewModel.walls)){
-        qp.setBrush(Qt::black);
+    for(auto &w:qAsConst(m_viewModel.cells)){
+        qp.setBrush(Qt::white);
         qp.drawRect(w.x()*Maze::Model::DOT_SIDE, w.y()*Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE);
     }
 }

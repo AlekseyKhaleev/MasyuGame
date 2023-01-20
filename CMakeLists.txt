@@ -13,8 +13,23 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
+        resources/resources.qrc
         main.cpp
-        AboutWidget.cpp AuthWidget.cpp ControlsWidget.cpp GameWidget.cpp HighscoresWidget.cpp MainWidget.cpp MenuWidget.cpp game/Controller.cpp game/EnergyView.cpp game/GameOverView.cpp game/LCDView.cpp game/LogView.cpp game/MazeModel.cpp game/MazeView.cpp game/RobotModel.cpp game/RobotView.cpp)
+        GameWidget.cpp   GameWidget.h
+        game/EnergyView.cpp game/EnergyView.h
+        game/MazeModel.cpp game/MazeModel.h
+        game/RobotModel.cpp game/RobotModel.h
+        game/RobotView.cpp game/RobotView.h
+        game/Controller.cpp game/Controller.h
+        game/MazeView.cpp game/MazeView.h
+        game/LCDView.cpp game/LCDView.h
+        game/GameOverView.cpp game/GameOverView.h
+        MenuWidget.cpp MenuWidget.h
+        MainWidget.cpp MainWidget.h
+        ControlsWidget.cpp ControlsWidget.h
+        AuthWidget.cpp AuthWidget.h
+        AboutWidget.cpp AboutWidget.h
+        HighscoresWidget.cpp HighscoresWidget.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(MasyuGame

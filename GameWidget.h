@@ -10,7 +10,6 @@
 #include "game/GameOverView.h"
 #include "game/EnergyView.h"
 #include "game/LCDView.h"
-#include "game/LogView.h"
 #include "game/MazeModel.h"
 #include "game/MazeView.h"
 #include "game/RobotModel.h"
@@ -36,7 +35,6 @@ private:
     GameOverView *m_gameOverView;
     LCDView *m_levelView;
     LCDView *m_scoreView;
-    LogView *m_logView;
     MazeView *m_mazeView;
     Maze::MazeModel *m_mazeModel;
     RobotView *m_robotView;

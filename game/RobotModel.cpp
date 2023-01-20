@@ -27,11 +27,17 @@ RobotModel::~RobotModel()=default;
 
 
 //*****************************************************
-
+QPoint RobotModel::locateRobot(){
+    auto const rec = QGuiApplication::primaryScreen()->size();
+    QPoint pos;
+    pos.rx() = rec.width() / (DOT_SIDE*2);
+    pos.ry() = rec.height() * 0.8 / (DOT_SIDE*2);
+    return pos;
+}
 void RobotModel::initRobot(){
     m_model.state = "init";
     m_model.robotDestination = UP;
-    m_model.robotPosition = QPoint{1, 1};
+    m_model.robotPosition = locateRobot();
     m_model.curColor = GREEN;
     m_model.tmpColor = WHITE;
     m_model.steps = 0;

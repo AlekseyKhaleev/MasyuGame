@@ -14,6 +14,8 @@
 
 
 namespace Robot {
+    const int DOT_SIDE{34};
+
     enum Directions {
         LEFT, RIGHT, UP, DOWN
     };
@@ -66,6 +68,8 @@ namespace Robot {
     private:
         Model m_model;
         QStack<Model> m_memory;
+
+        QPoint locateRobot();
     };
 }
 
