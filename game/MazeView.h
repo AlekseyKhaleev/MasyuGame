@@ -18,13 +18,11 @@ public slots:
 protected:
     Maze::Model m_viewModel;
 private:
-
-    QImage m_batteryImage;
-    QImage m_targetImage;
+    QImage m_blackImage;
+    QImage m_whiteImage;
 
     void drawMaze();
-    void drawTarget();
-    void drawBattery();
+    void drawNodes();
 };
 
 

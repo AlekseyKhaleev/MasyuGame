@@ -16,11 +16,9 @@ namespace Maze {
 
     struct Model {
         static const int DOT_SIDE{34};
-        int level{0}, fieldWidth{}, fieldHeight{}, maxEnergy{};
+        int level{0}, fieldWidth{}, fieldHeight{};
 
-        QSet<QPoint> walls, cells;
-        QVector<QPoint> batteries;
-        QPoint targetPosition;
+        QSet<QPoint> walls, cells, blackPoints, whitePoints;
         Model() = default;
     };
 
@@ -36,9 +34,6 @@ namespace Maze {
         void modelChanged(Maze::Model model);
 
     public slots:
-        void addBattery(QPoint value);
-
-        void delBattery(QPoint value);
 
         void stepBack();
 
@@ -55,15 +50,13 @@ namespace Maze {
 
         void initDefaultMazeMap();
 
-        void locateWalls();
-
         QPoint getRandDot();
-
-        void setMaxEnergy();
 
         static QVector<QPoint> getMazeNeighbours(QPoint current, const QSet<QPoint> &cells);
 
         static QVector<QPoint> getWayNeighbours(QPoint current, const QSet<QPoint> &cells);
+
+        void locateNodes();
     };
 }
 

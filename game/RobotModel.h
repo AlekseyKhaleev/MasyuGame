@@ -50,9 +50,9 @@ namespace Robot {
 
         void wait();                                                  //state "wait"
 
-        void rotate(Robot::Directions dir, Robot::Colors curColor);   // state "rotate"
+        void rotate(Robot::Directions dir);   // state "rotate"
 
-        void move(QPoint tar_pos, int score, Robot::Colors curColor); // state "move"
+        void move(QPoint tar_pos); // state "move"
 
         void stepBack();                                              // state "step back"
 

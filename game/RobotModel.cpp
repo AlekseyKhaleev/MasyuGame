@@ -74,23 +74,18 @@ void RobotModel::stepBack(){
 }
 
 
-void RobotModel::rotate(Robot::Directions dir, Robot::Colors curColor) {
+void RobotModel::rotate(Robot::Directions dir) {
     m_model.state = "rotate";
     m_model.robotDestination = dir;
     m_model.steps++;
-    m_model.curColor = curColor;
-    m_model.tmpColor = Colors::WHITE;
     m_memory.push(m_model);
     emit modelChanged(m_model);
 }
 
-void RobotModel::move(QPoint tar_pos, int score, Robot::Colors curColor) {
+void RobotModel::move(QPoint tar_pos) {
     m_model.state = "move";
     m_model.steps++;
     m_model.robotPosition = tar_pos;
-    m_model.score = score;
-    m_model.curColor = curColor;
-    m_model.tmpColor = Colors::WHITE;
     m_memory.push(m_model);
     emit modelChanged(m_model);
 }

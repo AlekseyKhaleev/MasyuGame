@@ -7,14 +7,14 @@
 #include <QString>
 #include <utility>
 
-#include "game/EnergyView.h"
+
 #include "game/MazeModel.h"
 #include "game/RobotModel.h"
 
 
 GameWidget::GameWidget(QString name, QWidget *parent)
     : QWidget{parent}, m_robotModel(new Robot::RobotModel(std::move(name))), m_mazeModel(new Maze::MazeModel(this)),
-    m_energyView(new EnergyView), m_gameOverView(new GameOverView)
+     m_gameOverView(new GameOverView)
 {
     m_controller = new Controller(m_robotModel->getModel(), m_mazeModel->getMazeModel());
     m_robotView  = new RobotView(m_robotModel->getModel());
@@ -59,16 +59,14 @@ GameWidget::GameWidget(QString name, QWidget *parent)
     connect(m_controller, SIGNAL(resetMaze()),    m_mazeModel,   SLOT(initMaze()));
     connect(m_controller, SIGNAL(resetRobot()),   m_robotModel,  SLOT(initRobot()));
 
-    connect(m_controller, SIGNAL(batteryFound(QPoint)),  m_mazeModel, SLOT(delBattery(QPoint)));
     connect(m_controller, SIGNAL(batteryFound(QPoint)),  m_robotModel,SLOT(replaceBattery(QPoint)));
-    connect(m_controller, SIGNAL(batteryLocated(QPoint)),m_mazeModel, SLOT(addBattery(QPoint)));
     connect(m_controller, SIGNAL(stepBack()),            m_mazeModel, SLOT(stepBack()));
 
-    connect(m_controller, SIGNAL(energyChanged(int)),                   m_energyView, SLOT(updateModel(int)));
+
     connect(m_controller, SIGNAL(stepBack()),                           m_robotModel, SLOT(stepBack()));
     connect(m_controller, SIGNAL(skinAnimated()),                       m_robotModel, SLOT(wait()));
-    connect(m_controller, SIGNAL(robotRotated(Robot::Directions, Robot::Colors)),m_robotModel, SLOT(rotate(Robot::Directions, Robot::Colors)));
-    connect(m_controller, SIGNAL(robotMoved(QPoint, int, Robot::Colors)),m_robotModel, SLOT(move(QPoint, int, Robot::Colors)));
+    connect(m_controller, SIGNAL(robotRotated(Robot::Directions)),m_robotModel, SLOT(rotate(Robot::Directions)));
+    connect(m_controller, SIGNAL(robotMoved(QPoint)),m_robotModel, SLOT(move(QPoint)));
     connect(m_controller, SIGNAL(returnClicked(int)),                   this, SIGNAL(returnClicked(int)));
 
     connect(this, SIGNAL(writeHighscore()), m_controller, SLOT(writeHighscore()));
@@ -79,8 +77,8 @@ GameWidget::GameWidget(QString name, QWidget *parent)
     gameLay->addWidget(m_robotView);
 
     auto *layout = new QGridLayout;
-    layout->addWidget(createLabel( m_robotModel->getModel().name + " ENERGY"), 0, 0, 2, 1);
-    layout->addWidget(m_energyView,2,0,3,1);
+    layout->addWidget(createLabel( "NAME:"), 0, 0, 2, 1);
+    layout->addWidget(createLabel(m_robotModel->getModel().name),2,0,3,1);
     layout->addWidget(createLabel("LEVEL"), 0, 1, 2, 1);
     layout->addWidget(m_levelView, 2, 1, 3, 1);
     layout->addWidget(createLabel("SCORE"), 0, 2, 2, 1);

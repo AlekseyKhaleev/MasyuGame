@@ -17,25 +17,25 @@ void Controller::keyEventAction(int eventKey) {
     switch (eventKey) {
         case Qt::Key_Left: {
             if(m_robotModel.robotDestination!=Robot::Directions::LEFT){
-                emit robotRotated(Robot::Directions::LEFT, checkEnergy());
+                emit robotRotated(Robot::Directions::LEFT);
             }
             break;
         }
         case Qt::Key_Right:{
             if(m_robotModel.robotDestination!=Robot::Directions::RIGHT){
-                emit robotRotated(Robot::Directions::RIGHT, checkEnergy());
+                emit robotRotated(Robot::Directions::RIGHT);
             }
             break;
         }
         case Qt::Key_Up:{
             if(m_robotModel.robotDestination!=Robot::Directions::UP){
-                emit robotRotated(Robot::Directions::UP, checkEnergy());
+                emit robotRotated(Robot::Directions::UP);
             }
             break;
         }
         case Qt::Key_Down:{
             if(m_robotModel.robotDestination!=Robot::Directions::DOWN){
-                emit robotRotated(Robot::Directions::DOWN, checkEnergy());
+                emit robotRotated(Robot::Directions::DOWN);
             }
             break;
         }
@@ -54,7 +54,7 @@ void Controller::keyEventAction(int eventKey) {
 
         default:break;
     }
-    if(m_robotModel.steps == m_mazeModel.maxEnergy) { emit levelDone(false); }
+//    if(m_robotModel.steps == m_mazeModel.maxEnergy) { emit levelDone(false); }
 }
 
 
@@ -69,7 +69,7 @@ void Controller::updateRobotModel(Robot::Model model) {
     m_robotModel = std::move(model);
     if(m_robotModel.state == "init"){ m_animationTimer.start(300); }
     if(m_robotModel.state == "exit"){ m_animationTimer.stop(); }
-    if(getPercentEnergy() || (m_robotModel.steps == m_mazeModel.maxEnergy)){ emit energyChanged(getPercentEnergy()); }
+//    if(getPercentEnergy() || (m_robotModel.steps == m_mazeModel.maxEnergy)){ emit energyChanged(getPercentEnergy()); }
 }
 
 
@@ -91,11 +91,6 @@ bool Controller::checkWall(QPoint dest) const{
 }
 
 
-int Controller::getPercentEnergy() const{
-    return (((m_mazeModel.maxEnergy - m_robotModel.steps) * 100) / m_mazeModel.maxEnergy);
-}
-
-
 int Controller::updateScore() const
 {
     if (m_scoreIncrease)
@@ -107,23 +102,23 @@ int Controller::updateScore() const
 }
 
 
-void Controller::checkBattery()
-{
-    if (m_mazeModel.batteries.contains(m_robotModel.robotPosition)) {
-       m_scoreIncrease = false;
-        emit batteryFound(m_robotModel.robotPosition);
-        emit energyChanged(getPercentEnergy());
+//void Controller::checkBattery()
+//{
+//    if (m_mazeModel.batteries.contains(m_robotModel.robotPosition)) {
+//       m_scoreIncrease = false;
+//        emit batteryFound(m_robotModel.robotPosition);
+//        emit energyChanged(getPercentEnergy());
+//
+//    }
+//}
 
-    }
-}
 
-
-void Controller::checkTarget(){
-    if (m_robotModel.robotPosition == m_mazeModel.targetPosition) {
-       m_scoreIncrease = true;
-       emit levelDone(true);
-    }
-}
+//void Controller::checkTarget(){
+//    if (m_robotModel.robotPosition == m_mazeModel.targetPosition) {
+//       m_scoreIncrease = true;
+//       emit levelDone(true);
+//    }
+//}
 
 void Controller::writeHighscore() const{
    auto *HSFile = new QFile("../resources/highscores.txt");
@@ -155,15 +150,15 @@ void Controller::writeHighscore() const{
    }
 }
 
-void Controller::locateBattery(){
-    QPoint battery;
-    do{
-        battery = getRandDot();
-    } while ((m_robotModel.robotPosition == battery) || (m_mazeModel.targetPosition == battery)
-             || (abs(battery.x() - m_robotModel.robotPosition.x()) > m_mazeModel.fieldWidth / 4)
-             || (abs(battery.y() - m_robotModel.robotPosition.y()) > m_mazeModel.fieldHeight / 2));
-    emit batteryLocated(battery);
-}
+//void Controller::locateBattery(){
+//    QPoint battery;
+//    do{
+//        battery = getRandDot();
+//    } while ((m_robotModel.robotPosition == battery) || (m_mazeModel.targetPosition == battery)
+//             || (abs(battery.x() - m_robotModel.robotPosition.x()) > m_mazeModel.fieldWidth / 4)
+//             || (abs(battery.y() - m_robotModel.robotPosition.y()) > m_mazeModel.fieldHeight / 2));
+//    emit batteryLocated(battery);
+//}
 
 
 void Controller::moveRobot(){
@@ -172,35 +167,35 @@ void Controller::moveRobot(){
         case Robot::LEFT: {
             tar_pos.rx()-=1;
             if (checkWall(tar_pos)) {
-                emit robotMoved(tar_pos, updateScore(), checkEnergy());
+                emit robotMoved(tar_pos);
             }
             break;
         }
         case Robot::RIGHT:{
             tar_pos.rx()+=1;
             if (checkWall(tar_pos)) {
-                emit robotMoved(tar_pos, updateScore(), checkEnergy());
+                emit robotMoved(tar_pos);
             }
             break;
         }
         case Robot::UP:{
             tar_pos.ry()-=1;
             if (checkWall(tar_pos)) {
-                emit robotMoved(tar_pos, updateScore(), checkEnergy());
+                emit robotMoved(tar_pos);
             }
             break;
         }
         case Robot::DOWN:{
             tar_pos.ry()+=1;
             if (checkWall(tar_pos)) {
-                emit robotMoved(tar_pos, updateScore(), checkEnergy());
+                emit robotMoved(tar_pos);
             }
             break;
         }
         default: break;
     }
-    checkTarget();
-    checkBattery();
+//    checkTarget();
+//    checkBattery();
 
 }
 
@@ -217,24 +212,6 @@ QPoint Controller::getRandDot() const {
 }
 
 
-Robot::Colors Controller::checkEnergy()
-{
-    int curEnergy = getPercentEnergy();
-    if(m_robotModel.steps == m_mazeModel.maxEnergy){
-        return Robot::WHITE;
-    }
-
-
-    if ((curEnergy <= 70) && ((m_robotModel.curColor == Robot::GREEN)||(m_robotModel.tmpColor == Robot::GREEN))) {
-        locateBattery();
-        return (Robot::YELLOW);
-    }
-    if((curEnergy <= 30) && ((m_robotModel.curColor == Robot::YELLOW)||(m_robotModel.tmpColor == Robot::YELLOW))){
-        locateBattery();
-        return (Robot::RED);
-    }
-    return (m_robotModel.tmpColor == Robot::WHITE? m_robotModel.curColor:m_robotModel.tmpColor);
-}
 
 void Controller::exit()
 {

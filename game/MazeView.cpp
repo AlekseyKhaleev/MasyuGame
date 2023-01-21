@@ -11,8 +11,8 @@
 using namespace Maze;
 
 MazeView::MazeView(Model targetModel, QWidget *parent)
-    : QWidget(parent), m_viewModel(std::move(targetModel)),m_batteryImage(QImage(":/images/battery.png")),
-    m_targetImage(QImage(":/images/target.png"))
+    : QWidget(parent), m_viewModel(std::move(targetModel)),m_blackImage(QImage(":/images/black.png")),
+    m_whiteImage(QImage(":/images/white.png"))
 {
     repaint();
 }
@@ -30,8 +30,8 @@ void MazeView::paintEvent(QPaintEvent *event) {
 //    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 
     drawMaze();
-    drawTarget();
-    drawBattery();
+    drawNodes();
+
 }
 
 void MazeView::drawMaze(){
@@ -42,20 +42,15 @@ void MazeView::drawMaze(){
     }
 }
 
-void MazeView::drawTarget(){
+void MazeView::drawNodes(){
     QPainter qp(this);
-    qp.drawImage(QRect(m_viewModel.targetPosition.x() * Maze::Model::DOT_SIDE,
-                       m_viewModel.targetPosition.y() * Maze::Model::DOT_SIDE,
-                       Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE), m_targetImage);
-}
-
-void MazeView::drawBattery(){
-    QPainter qp(this);
-    for (auto &b : m_viewModel.batteries) {
-        if (b.x() >= 0) {
-            qp.drawImage(QRect(b.x() * Maze::Model::DOT_SIDE, b.y() * Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE),
-                         m_batteryImage);
-        }
+    for (auto &b : m_viewModel.blackPoints) {
+        qp.drawImage(QRect(b.x() * Maze::Model::DOT_SIDE, b.y() * Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE,
+                           Maze::Model::DOT_SIDE), m_blackImage);
+    }
+    for (auto &b : m_viewModel.whitePoints) {
+        qp.drawImage(QRect(b.x() * Maze::Model::DOT_SIDE, b.y() * Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE,
+                           Maze::Model::DOT_SIDE), m_whiteImage);
     }
 }
 

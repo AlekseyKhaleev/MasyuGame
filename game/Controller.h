@@ -20,8 +20,8 @@ signals:
     void resetMaze();
     void resetRobot();
     void returnClicked(int button=Menu::RETURN);
-    void robotMoved(QPoint position, int score, Robot::Colors curColor);
-    void robotRotated(Robot::Directions dir, Robot::Colors curColor);
+    void robotMoved(QPoint position);
+    void robotRotated(Robot::Directions dir);
     void skinAnimated();
     void stepBack();
 

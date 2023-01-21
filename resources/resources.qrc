@@ -1,14 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/battery.png</file>
-        <file>images/en_0.png</file>
-        <file>images/en_10.png</file>
-        <file>images/en_30.png</file>
-        <file>images/en_50.png</file>
-        <file>images/en_70.png</file>
-        <file>images/en_80.png</file>
-        <file>images/en_90.png</file>
-        <file>images/target.png</file>
+        <file>images/black.png</file>
+        <file>images/white.png</file>
         <file>images/VC_gr_dn.png</file>
         <file>images/VC_gr_lt.png</file>
         <file>images/VC_gr_rt.png</file>

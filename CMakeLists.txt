@@ -16,7 +16,6 @@ set(PROJECT_SOURCES
         resources/resources.qrc
         main.cpp
         GameWidget.cpp   GameWidget.h
-        game/EnergyView.cpp game/EnergyView.h
         game/MazeModel.cpp game/MazeModel.h
         game/RobotModel.cpp game/RobotModel.h
         game/RobotView.cpp game/RobotView.h

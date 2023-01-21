@@ -8,7 +8,7 @@
 
 #include "game/Controller.h"
 #include "game/GameOverView.h"
-#include "game/EnergyView.h"
+
 #include "game/LCDView.h"
 #include "game/MazeModel.h"
 #include "game/MazeView.h"
@@ -31,7 +31,6 @@ public:
 
 private:
     Controller *m_controller;
-    EnergyView *m_energyView;
     GameOverView *m_gameOverView;
     LCDView *m_levelView;
     LCDView *m_scoreView;
