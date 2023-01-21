@@ -30,6 +30,7 @@ private:
     QVector<QVector<QImage>> m_robotSkin{m_white, m_green, m_yellow, m_red};
 
     QImage m_way;
+    QImage m_start;
 
 
     void keyPressEvent(QKeyEvent *event) override;
@@ -38,6 +39,8 @@ private:
     void drawRobot();
 
     void drawWay();
+
+    void drawStartPoint();
 };
 
 

@@ -23,6 +23,8 @@ private:
 
     void drawMaze();
     void drawNodes();
+
+    void drawTmpWalls();
 };
 
 

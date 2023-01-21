@@ -8,6 +8,9 @@
 #include <QStyleOption>
 #include <utility>
 
+//#include "Utils.h"
+
+using namespace utils;
 using namespace Maze;
 
 MazeView::MazeView(Model targetModel, QWidget *parent)
@@ -23,34 +26,35 @@ MazeView::~MazeView()=default;
 
 void MazeView::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event)
-
-//    QStyleOption opt;
-//    opt.initFrom(this);
-//    QPainter p(this);
-//    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
-
     drawMaze();
+    drawTmpWalls();
     drawNodes();
+}
 
+void MazeView::drawTmpWalls(){
+    QPainter qp(this);
+    for(auto &w:qAsConst(m_viewModel.tmpWalls)){
+        qp.setBrush(Qt::red);
+        if(!m_viewModel.walls.contains(w))
+        qp.drawRect(w.x()*DOT_SIDE, w.y()*DOT_SIDE, DOT_SIDE, DOT_SIDE);
+    }
 }
 
 void MazeView::drawMaze(){
     QPainter qp(this);
-    for(auto &w:qAsConst(m_viewModel.cells)){
+    for(auto &c:qAsConst(m_viewModel.cells)){
         qp.setBrush(Qt::white);
-        qp.drawRect(w.x()*Maze::Model::DOT_SIDE, w.y()*Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE);
+        qp.drawRect(c.x() * DOT_SIDE, c.y() * DOT_SIDE, DOT_SIDE, DOT_SIDE);
     }
 }
 
 void MazeView::drawNodes(){
     QPainter qp(this);
     for (auto &b : m_viewModel.blackPoints) {
-        qp.drawImage(QRect(b.x() * Maze::Model::DOT_SIDE, b.y() * Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE,
-                           Maze::Model::DOT_SIDE), m_blackImage);
+        qp.drawImage(QRect(b.x() * DOT_SIDE, b.y() * DOT_SIDE, DOT_SIDE,DOT_SIDE), m_blackImage);
     }
     for (auto &b : m_viewModel.whitePoints) {
-        qp.drawImage(QRect(b.x() * Maze::Model::DOT_SIDE, b.y() * Maze::Model::DOT_SIDE, Maze::Model::DOT_SIDE,
-                           Maze::Model::DOT_SIDE), m_whiteImage);
+        qp.drawImage(QRect(b.x() * DOT_SIDE, b.y() * DOT_SIDE, DOT_SIDE,DOT_SIDE), m_whiteImage);
     }
 }
 

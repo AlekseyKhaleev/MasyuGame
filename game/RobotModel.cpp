@@ -18,6 +18,7 @@ using namespace Robot;
 RobotModel::RobotModel(QString name, QObject *parent): QObject(parent)
 {
     m_model.name = std::move(name);
+    m_model.startPosition = utils::getRandDot();
     initRobot();
 }
 
@@ -26,22 +27,17 @@ RobotModel::~RobotModel()=default;
 
 
 //*****************************************************
-QPoint RobotModel::locateRobot(){
-    auto const rec = QGuiApplication::primaryScreen()->size();
-    QPoint pos;
-    pos.rx() = rec.width() / (Robot::Model::DOT_SIDE*2);
-    pos.ry() = rec.height() * 0.8 / (Robot::Model::DOT_SIDE*2);
-    return pos;
-}
+
 void RobotModel::initRobot(){
     m_model.state = "init";
     m_model.robotDestination = UP;
-    m_model.robotPosition = locateRobot();
+    m_model.robotPosition = m_model.startPosition;
     m_model.way.insert(m_model.robotPosition);
     m_model.curColor = GREEN;
     m_model.tmpColor = WHITE;
     m_model.steps = 0;
     m_memory.clear();
+    m_model.way.clear();
     m_memory.push(m_model);
     if(m_model.score){ m_model.score += 100; }
     emit modelChanged(m_model);

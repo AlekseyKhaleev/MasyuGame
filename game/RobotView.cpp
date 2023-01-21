@@ -2,12 +2,17 @@
 #include "RobotView.h"
 
 #include <QCoreApplication>
+
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QPainter>
 #include <QStyleOption>
 #include <QTimerEvent>
 #include <utility>
+
+#include "Utils.h"
+
+using namespace utils;
 
 
 
@@ -38,7 +43,8 @@ m_red(QVector<QImage>{
         QImage(":/images/VC_rd_up"),
         QImage(":/images/VC_rd_dn")
 }),
-m_way(QImage(":/images/way"))
+m_way(QImage(":/images/way")),
+m_start(QImage(":/images/start"))
 {
 //    repaint();
 }
@@ -46,6 +52,7 @@ m_way(QImage(":/images/way"))
 void RobotView::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event)
     drawWay();
+    drawStartPoint();
     drawRobot();
 }
 void RobotView::keyPressEvent(QKeyEvent *event){
@@ -56,22 +63,22 @@ void RobotView::keyPressEvent(QKeyEvent *event){
 void RobotView::drawWay(){
     QPainter qp(this);
     for(auto &el: qAsConst(m_viewModel.way)) {
-        qp.drawImage(QRect(el.x() * Robot::Model::DOT_SIDE,
-                           el.y() * Robot::Model::DOT_SIDE,
-                           Robot::Model::DOT_SIDE,
-                           Robot::Model::DOT_SIDE),
-                     m_way);
+        qp.drawImage(QRect(el.x() * DOT_SIDE,el.y() * DOT_SIDE,DOT_SIDE,DOT_SIDE),m_way);
     }
 }
+
+void RobotView::drawStartPoint(){
+    QPainter qp(this);
+    qp.drawImage(QRect(m_viewModel.startPosition.x() * DOT_SIDE,m_viewModel.startPosition.y() * DOT_SIDE,
+                       DOT_SIDE,DOT_SIDE),m_start);
+}
+
 
 void RobotView::drawRobot(){
     QPainter qp(this);
 
-    qp.drawImage(QRect(m_viewModel.robotPosition.x() * Robot::Model::DOT_SIDE,
-                       m_viewModel.robotPosition.y() * Robot::Model::DOT_SIDE,
-                       Robot::Model::DOT_SIDE,
-                       Robot::Model::DOT_SIDE),
-                 m_robotSkin[m_viewModel.curColor][m_viewModel.robotDestination]);
+    qp.drawImage(QRect(m_viewModel.robotPosition.x() * DOT_SIDE,m_viewModel.robotPosition.y() * DOT_SIDE,
+                       DOT_SIDE,DOT_SIDE),m_robotSkin[m_viewModel.curColor][m_viewModel.robotDestination]);
 }
 
 void RobotView::updateModel(Robot::Model model) {

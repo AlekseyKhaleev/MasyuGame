@@ -15,10 +15,8 @@
 namespace Maze {
 
     struct Model {
-        static const int DOT_SIDE{68};
-        int level{0}, fieldWidth{}, fieldHeight{};
-
-        QSet<QPoint> walls, cells, blackPoints, whitePoints;
+        int level{0};
+        QSet<QPoint> walls, tmpWalls, cells, blackPoints, whitePoints;
         Model() = default;
     };
 
@@ -41,16 +39,16 @@ namespace Maze {
 
         void resetLevel(bool success);
 
+        void updateTmpWalls(QSet<QPoint> tmpWalls);
+
         Model getMazeModel();
 
     private:
         Model m_model;
 
-        void initFieldSize();
+        QStack<Model> m_memory;
 
         void initDefaultMazeMap();
-
-        QPoint getRandDot();
 
         static QVector<QPoint> getMazeNeighbours(QPoint current, const QSet<QPoint> &cells);
 

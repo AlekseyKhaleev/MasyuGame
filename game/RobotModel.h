@@ -24,7 +24,6 @@ namespace Robot {
     };
 
     struct Model {
-        static const int DOT_SIDE{68};
 
         int score{0}, highScore{0}, steps{};
 
@@ -32,7 +31,7 @@ namespace Robot {
 
         QString name, state;
 
-        QPoint robotPosition;
+        QPoint robotPosition, startPosition;
 
         Colors curColor{}, tmpColor{};
 

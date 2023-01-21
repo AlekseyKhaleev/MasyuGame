@@ -58,11 +58,9 @@ void Controller::keyEventAction(int eventKey) {
 }
 
 
-
 void Controller::updateMazeModel(Maze::Model model) {
     m_mazeModel = std::move(model);
 }
-
 
 
 void Controller::updateRobotModel(Robot::Model model) {
@@ -71,7 +69,6 @@ void Controller::updateRobotModel(Robot::Model model) {
     if(m_robotModel.state == "exit"){ m_animationTimer.stop(); }
 //    if(getPercentEnergy() || (m_robotModel.steps == m_mazeModel.maxEnergy)){ emit energyChanged(getPercentEnergy()); }
 }
-
 
 
 Controller::Controller(Robot::Model robotModel, Maze::Model mazeModel, QObject *parent) :
@@ -87,7 +84,7 @@ Controller::~Controller()=default;
 
 
 bool Controller::checkWall(QPoint dest) const{
-    return !m_mazeModel.walls.contains(dest);
+    return !(m_mazeModel.walls.contains(dest)||m_robotModel.way.contains(dest)||m_mazeModel.tmpWalls.contains(dest));
 }
 
 
@@ -101,6 +98,86 @@ int Controller::updateScore() const
     else {return (m_robotModel.score);}
 }
 
+void Controller::checkPoint()
+{
+#define pos m_robotModel.robotPosition
+#define way m_robotModel.way
+#define tmpWalls m_mazeModel.tmpWalls
+#define dest m_robotModel.robotDestination
+
+    //удаляем диаганальные клетки из ограничений на движения
+    QVector<QPoint> oldTmpWalls{
+            QPoint{pos.rx() - 1, pos.ry() - 1},
+            QPoint{pos.rx() + 1, pos.ry() + 1},
+            QPoint{pos.rx() - 1, pos.ry() + 1},
+            QPoint{pos.rx() + 1, pos.ry() - 1}
+    };
+    for(auto &p:oldTmpWalls){
+        tmpWalls.remove(p);
+    }
+
+    if (m_mazeModel.whitePoints.contains(pos)) {
+        //для белых точек
+        if ((dest == Robot::UP) || (dest == Robot::DOWN)) {
+            tmpWalls.insert(QPoint{pos.rx() - 1, pos.ry()}); //запрет левой клетки
+            tmpWalls.insert(QPoint{pos.rx() + 1, pos.ry()}); //запрет правой клетки
+        } else {
+            tmpWalls.insert(QPoint{pos.rx(), pos.ry() - 1}); //запрет верхней клетки
+            tmpWalls.insert(QPoint{pos.rx(), pos.ry() + 1}); //запрет нижней клетки
+        }
+
+        for (auto &p: oldTmpWalls) {  //если перед попаданием был поворот
+            if (way.contains(p)) {
+                emit TmpWallsUpdated(tmpWalls);
+                return;
+            }
+        }
+        //если поворота не было
+        switch (dest) {
+            //запрет прямого движения через ход
+            case Robot::UP:
+                tmpWalls.insert(QPoint{pos.rx(), pos.ry() - 2});
+                break;
+            case Robot::DOWN:
+                tmpWalls.insert(QPoint{pos.rx(), pos.ry() + 2});
+                break;
+            case Robot::LEFT:
+                tmpWalls.insert(QPoint{pos.rx() - 2, pos.ry()});
+                break;
+            case Robot::RIGHT:
+                tmpWalls.insert(QPoint{pos.rx() + 2, pos.ry()});
+                break;
+            default:
+                break;
+        }
+        emit TmpWallsUpdated(tmpWalls);
+        return;
+    }
+    if(m_mazeModel.blackPoints.contains(pos)){
+        switch (dest) {
+            //запрет прямого движения через ход
+            case Robot::UP:
+                tmpWalls.insert(QPoint{pos.rx(), pos.ry() - 1});
+                break;
+            case Robot::DOWN:
+                tmpWalls.insert(QPoint{pos.rx(), pos.ry() + 1});
+                break;
+            case Robot::LEFT:
+                tmpWalls.insert(QPoint{pos.rx() - 1, pos.ry()});
+                break;
+            case Robot::RIGHT:
+                tmpWalls.insert(QPoint{pos.rx() + 1, pos.ry()});
+                break;
+            default:
+                break;
+        }
+    }
+    emit TmpWallsUpdated(tmpWalls);
+#undef pos
+#undef way
+#undef tmpWalls
+#undef dest
+}
 
 //void Controller::checkBattery()
 //{
@@ -162,12 +239,15 @@ void Controller::writeHighscore() const{
 
 
 void Controller::moveRobot(){
+#define pos m_robotModel.robotPosition
+
     QPoint tar_pos = m_robotModel.robotPosition;
     switch (m_robotModel.robotDestination) {
         case Robot::LEFT: {
             tar_pos.rx()-=1;
             if (checkWall(tar_pos)) {
                 emit robotMoved(tar_pos);
+                checkPoint();
             }
             break;
         }
@@ -175,6 +255,7 @@ void Controller::moveRobot(){
             tar_pos.rx()+=1;
             if (checkWall(tar_pos)) {
                 emit robotMoved(tar_pos);
+                checkPoint();
             }
             break;
         }
@@ -182,6 +263,7 @@ void Controller::moveRobot(){
             tar_pos.ry()-=1;
             if (checkWall(tar_pos)) {
                 emit robotMoved(tar_pos);
+                checkPoint();
             }
             break;
         }
@@ -189,28 +271,24 @@ void Controller::moveRobot(){
             tar_pos.ry()+=1;
             if (checkWall(tar_pos)) {
                 emit robotMoved(tar_pos);
+                checkPoint();
             }
             break;
         }
         default: break;
     }
-//    checkTarget();
-//    checkBattery();
 
+    for(auto &p:QVector<QPoint>{
+        QPoint{pos.rx()+1,pos.ry()},
+        QPoint{pos.rx()-1,pos.ry()},
+        QPoint{pos.rx(),pos.ry()+1},
+        QPoint{pos.rx(),pos.ry()-1}
+        }){
+        if(!(m_mazeModel.tmpWalls.contains(p)||m_mazeModel.walls.contains(p)||m_robotModel.way.contains(p))) return;
+    }
+    emit levelDone(false);
+#undef pos
 }
-
-
-QPoint Controller::getRandDot() const {
-    QTime time = QTime::currentTime();
-    srand((uint) time.msec());
-    QPoint dot;
-    do{
-        dot.rx() = rand() % m_mazeModel.fieldWidth;
-        dot.ry() = rand() % m_mazeModel.fieldHeight;
-    }while(m_mazeModel.walls.contains(dot));
-    return dot;
-}
-
 
 
 void Controller::exit()

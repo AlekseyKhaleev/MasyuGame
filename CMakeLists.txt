@@ -29,7 +29,7 @@ set(PROJECT_SOURCES
         ControlsWidget.cpp ControlsWidget.h
         AuthWidget.cpp AuthWidget.h
         AboutWidget.cpp AboutWidget.h
-        HighscoresWidget.cpp HighscoresWidget.h game/Utils.h)
+        HighscoresWidget.cpp HighscoresWidget.h game/Utils.h game/Utils.cpp)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(MasyuGame

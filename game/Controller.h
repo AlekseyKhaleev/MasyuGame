@@ -13,9 +13,6 @@ class Controller: public QObject {
     Q_OBJECT
 
 signals:
-    void batteryFound(QPoint batPos);
-    void batteryLocated(QPoint value);
-    void energyChanged(int percEnergy);
     void levelDone(bool success=true);
     void resetMaze();
     void resetRobot();
@@ -24,6 +21,7 @@ signals:
     void robotRotated(Robot::Directions dir);
     void skinAnimated();
     void stepBack();
+    void TmpWallsUpdated(QSet<QPoint> tmpWalls);
 
 public slots:
     void exit();
@@ -46,19 +44,10 @@ private:
     Maze::Model m_mazeModel;
 
     [[nodiscard]] bool checkWall(QPoint dest) const;
-
-    [[nodiscard]] int getPercentEnergy() const;
     [[nodiscard]] int updateScore() const;
 
-    void checkBattery();
-    void checkTarget();
-    void locateBattery();
     void moveRobot();
-
-
-    [[nodiscard]] QPoint getRandDot() const;
-
-    Robot::Colors checkEnergy();
+    void checkPoint();
 };
 
 

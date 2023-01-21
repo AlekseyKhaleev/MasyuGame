@@ -59,7 +59,7 @@ GameWidget::GameWidget(QString name, QWidget *parent)
     connect(m_controller, SIGNAL(resetMaze()),    m_mazeModel,   SLOT(initMaze()));
     connect(m_controller, SIGNAL(resetRobot()),   m_robotModel,  SLOT(initRobot()));
 
-    connect(m_controller, SIGNAL(batteryFound(QPoint)),  m_robotModel,SLOT(replaceBattery(QPoint)));
+    connect(m_controller, SIGNAL(TmpWallsUpdated(QSet<QPoint>)),  m_mazeModel,SLOT(updateTmpWalls(QSet<QPoint>)));
     connect(m_controller, SIGNAL(stepBack()),            m_mazeModel, SLOT(stepBack()));
 
 
