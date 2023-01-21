@@ -35,14 +35,14 @@ QPoint MazeModel::getRandDot(){
     srand((uint) time.msec());
     QPoint dot;
     do{
-        dot.rx() = (rand() % m_model.fieldWidth)+(m_model.fieldWidth-m_model.fieldHeight)/2;
+        dot.rx() = (rand() % (m_model.fieldWidth - (m_model.fieldWidth-m_model.fieldHeight)/2))+(m_model.fieldWidth-m_model.fieldHeight)/2;
         dot.ry() = rand() % m_model.fieldHeight;
     }while(m_model.walls.contains(dot));
     return dot;
 }
 
 void MazeModel::locateNodes() {
-    for(int i=0; i<(m_model.fieldHeight*m_model.fieldHeight)/8;i++){
+    for(int i=0; i<(m_model.fieldHeight*m_model.fieldHeight)/16;i++){
         QPoint dot;
         do{
             dot = getRandDot();

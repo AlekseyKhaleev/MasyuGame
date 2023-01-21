@@ -5,16 +5,15 @@
 #include <QObject>
 #include <QPoint>
 #include <QStack>
+#include <QSet>
 
 #include <iostream>
 #include <memory>
 
 
-//inline uint qHash(const QPoint &key) { return (key.x() << 16) + key.y(); }
 
 
 namespace Robot {
-    const int DOT_SIDE{34};
 
     enum Directions {
         LEFT, RIGHT, UP, DOWN
@@ -25,9 +24,11 @@ namespace Robot {
     };
 
     struct Model {
-        static const int DOT_SIDE{34};
+        static const int DOT_SIDE{68};
 
         int score{0}, highScore{0}, steps{};
+
+        QSet<QPoint> way;
 
         QString name, state;
 

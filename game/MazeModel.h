@@ -10,12 +10,12 @@
 #include <QVector>
 #include <QWidget>
 
-inline uint qHash(const QPoint &key) { return (key.x() << 16) + key.y(); }
+#include "Utils.h"
 
 namespace Maze {
 
     struct Model {
-        static const int DOT_SIDE{34};
+        static const int DOT_SIDE{68};
         int level{0}, fieldWidth{}, fieldHeight{};
 
         QSet<QPoint> walls, cells, blackPoints, whitePoints;

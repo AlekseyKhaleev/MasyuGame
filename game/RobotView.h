@@ -29,11 +29,15 @@ private:
     QVector<QImage> m_red;
     QVector<QVector<QImage>> m_robotSkin{m_white, m_green, m_yellow, m_red};
 
+    QImage m_way;
+
 
     void keyPressEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
     void drawRobot();
+
+    void drawWay();
 };
 
 

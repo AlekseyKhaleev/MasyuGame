@@ -1,14 +1,13 @@
 #include "RobotModel.h"
 
 
-
 #include <QKeyEvent>
 #include <QStyleOption>
 #include <QtGui>
 #include <QVector>
 #include <utility>
 
-
+#include "Utils.h"
 
 
 using namespace Robot;
@@ -30,14 +29,15 @@ RobotModel::~RobotModel()=default;
 QPoint RobotModel::locateRobot(){
     auto const rec = QGuiApplication::primaryScreen()->size();
     QPoint pos;
-    pos.rx() = rec.width() / (DOT_SIDE*2);
-    pos.ry() = rec.height() * 0.8 / (DOT_SIDE*2);
+    pos.rx() = rec.width() / (Robot::Model::DOT_SIDE*2);
+    pos.ry() = rec.height() * 0.8 / (Robot::Model::DOT_SIDE*2);
     return pos;
 }
 void RobotModel::initRobot(){
     m_model.state = "init";
     m_model.robotDestination = UP;
     m_model.robotPosition = locateRobot();
+    m_model.way.insert(m_model.robotPosition);
     m_model.curColor = GREEN;
     m_model.tmpColor = WHITE;
     m_model.steps = 0;
@@ -62,6 +62,7 @@ void RobotModel::stepBack(){
          m_model.robotDestination = lastModel.robotDestination;
          m_model.score = lastModel.score;
          m_model.steps = lastModel.steps;
+         m_model.way = lastModel.way;
          m_model.curColor = lastModel.curColor;
          m_model.tmpColor = lastModel.tmpColor;
          m_model.state = "step back";
@@ -86,6 +87,7 @@ void RobotModel::move(QPoint tar_pos) {
     m_model.state = "move";
     m_model.steps++;
     m_model.robotPosition = tar_pos;
+    m_model.way.insert(tar_pos);
     m_memory.push(m_model);
     emit modelChanged(m_model);
 }

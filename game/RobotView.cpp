@@ -37,18 +37,31 @@ m_red(QVector<QImage>{
         QImage(":/images/VC_rd_rt"),
         QImage(":/images/VC_rd_up"),
         QImage(":/images/VC_rd_dn")
-})
+}),
+m_way(QImage(":/images/way"))
 {
 //    repaint();
 }
 
 void RobotView::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event)
+    drawWay();
     drawRobot();
 }
 void RobotView::keyPressEvent(QKeyEvent *event){
 
     emit keyHandled(event->key());
+}
+
+void RobotView::drawWay(){
+    QPainter qp(this);
+    for(auto &el: qAsConst(m_viewModel.way)) {
+        qp.drawImage(QRect(el.x() * Robot::Model::DOT_SIDE,
+                           el.y() * Robot::Model::DOT_SIDE,
+                           Robot::Model::DOT_SIDE,
+                           Robot::Model::DOT_SIDE),
+                     m_way);
+    }
 }
 
 void RobotView::drawRobot(){
