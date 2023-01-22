@@ -6,6 +6,7 @@
 #include <QPoint>
 #include <QStack>
 #include <QSet>
+#include <QQueue>
 
 #include <iostream>
 #include <memory>
@@ -32,6 +33,8 @@ namespace Robot {
         QString name, state;
 
         QPoint robotPosition, startPosition;
+
+        QQueue<QPoint> lastPosition;
 
         Colors curColor{}, tmpColor{};
 

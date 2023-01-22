@@ -18,7 +18,6 @@ using namespace Robot;
 RobotModel::RobotModel(QString name, QObject *parent): QObject(parent)
 {
     m_model.name = std::move(name);
-    m_model.startPosition = utils::getRandDot();
     initRobot();
 }
 
@@ -31,7 +30,10 @@ RobotModel::~RobotModel()=default;
 void RobotModel::initRobot(){
     m_model.state = "init";
     m_model.robotDestination = UP;
+    m_model.startPosition = utils::getRandDot();
     m_model.robotPosition = m_model.startPosition;
+    m_model.lastPosition.enqueue(m_model.startPosition);
+    m_model.lastPosition.enqueue(m_model.startPosition);
     m_model.way.insert(m_model.robotPosition);
     m_model.curColor = GREEN;
     m_model.tmpColor = WHITE;
@@ -59,6 +61,7 @@ void RobotModel::stepBack(){
          m_model.score = lastModel.score;
          m_model.steps = lastModel.steps;
          m_model.way = lastModel.way;
+         m_model.lastPosition = lastModel.lastPosition;
          m_model.curColor = lastModel.curColor;
          m_model.tmpColor = lastModel.tmpColor;
          m_model.state = "step back";
@@ -82,6 +85,8 @@ void RobotModel::rotate(Robot::Directions dir) {
 void RobotModel::move(QPoint tar_pos) {
     m_model.state = "move";
     m_model.steps++;
+    m_model.lastPosition.dequeue();
+    m_model.lastPosition.enqueue(m_model.robotPosition);
     m_model.robotPosition = tar_pos;
     m_model.way.insert(tar_pos);
     m_memory.push(m_model);

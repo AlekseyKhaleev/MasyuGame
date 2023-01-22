@@ -56,6 +56,57 @@ void Controller::keyEventAction(int eventKey) {
     }
 //    if(m_robotModel.steps == m_mazeModel.maxEnergy) { emit levelDone(false); }
 }
+QSet<QPoint> Controller::getNeighbours(){
+#define pos m_robotModel.robotPosition
+    QSet<QPoint> tmpSet;
+    for (auto &p: QVector<QPoint>{
+            QPoint{pos.rx() + 1, pos.ry()},
+            QPoint{pos.rx() - 1, pos.ry()},
+            QPoint{pos.rx(), pos.ry() + 1},
+            QPoint{pos.rx(), pos.ry() - 1}
+    }) {
+        if ((!m_mazeModel.tmpWalls.contains(p) && !m_mazeModel.walls.contains(p) &&
+              !m_robotModel.way.contains(p)))
+            tmpSet.insert(p);
+    }
+    return tmpSet;
+#undef  pos
+}
+
+void Controller::rotate(QPoint dest){
+    if((m_robotModel.robotPosition.rx()-dest.rx())==1){
+        emit robotRotated(Robot::LEFT);
+        return;
+    }
+    if((m_robotModel.robotPosition.rx()-dest.rx())==-1){
+        emit robotRotated(Robot::RIGHT);
+        return;
+    }
+    if((m_robotModel.robotPosition.ry()-dest.ry())==1){
+        emit robotRotated(Robot::DOWN);
+        return;
+    }
+    if((m_robotModel.robotPosition.rx()-dest.rx())==-1){
+        emit robotRotated(Robot::UP);
+        return;
+    }
+}
+
+bool Controller::solve(){
+    QSet<QPoint> neighbours = getNeighbours();
+    bool target = false;
+    for(auto &n:neighbours){
+        rotate(n);
+        moveRobot(true);
+        if((target = solve())) break;
+        emit stepBack();
+    }
+    if (checkTarget()){
+        m_trueWay.push(m_robotModel.robotPosition);
+        return true;
+    } else
+        return false;
+}
 
 
 void Controller::updateMazeModel(Maze::Model model) {
@@ -98,12 +149,12 @@ int Controller::updateScore() const
     else {return (m_robotModel.score);}
 }
 
-void Controller::checkPoint()
+void Controller::checkPoints()
 {
 #define pos m_robotModel.robotPosition
-#define way m_robotModel.way
 #define tmpWalls m_mazeModel.tmpWalls
 #define dest m_robotModel.robotDestination
+
 
     //удаляем диаганальные клетки из ограничений на движения
     QVector<QPoint> oldTmpWalls{
@@ -126,8 +177,10 @@ void Controller::checkPoint()
             tmpWalls.insert(QPoint{pos.rx(), pos.ry() + 1}); //запрет нижней клетки
         }
 
+        QQueue<QPoint> tmpPositions = m_robotModel.lastPosition;
+        QPoint tmpPos = tmpPositions.dequeue();
         for (auto &p: oldTmpWalls) {  //если перед попаданием был поворот
-            if (way.contains(p)) {
+            if (tmpPos == p) {
                 emit TmpWallsUpdated(tmpWalls);
                 return;
             }
@@ -174,28 +227,10 @@ void Controller::checkPoint()
     }
     emit TmpWallsUpdated(tmpWalls);
 #undef pos
-#undef way
 #undef tmpWalls
 #undef dest
 }
 
-//void Controller::checkBattery()
-//{
-//    if (m_mazeModel.batteries.contains(m_robotModel.robotPosition)) {
-//       m_scoreIncrease = false;
-//        emit batteryFound(m_robotModel.robotPosition);
-//        emit energyChanged(getPercentEnergy());
-//
-//    }
-//}
-
-
-//void Controller::checkTarget(){
-//    if (m_robotModel.robotPosition == m_mazeModel.targetPosition) {
-//       m_scoreIncrease = true;
-//       emit levelDone(true);
-//    }
-//}
 
 void Controller::writeHighscore() const{
    auto *HSFile = new QFile("../resources/highscores.txt");
@@ -227,18 +262,7 @@ void Controller::writeHighscore() const{
    }
 }
 
-//void Controller::locateBattery(){
-//    QPoint battery;
-//    do{
-//        battery = getRandDot();
-//    } while ((m_robotModel.robotPosition == battery) || (m_mazeModel.targetPosition == battery)
-//             || (abs(battery.x() - m_robotModel.robotPosition.x()) > m_mazeModel.fieldWidth / 4)
-//             || (abs(battery.y() - m_robotModel.robotPosition.y()) > m_mazeModel.fieldHeight / 2));
-//    emit batteryLocated(battery);
-//}
-
-
-void Controller::moveRobot(){
+void Controller::moveRobot(bool solver){
 #define pos m_robotModel.robotPosition
 
     QPoint tar_pos = m_robotModel.robotPosition;
@@ -247,7 +271,6 @@ void Controller::moveRobot(){
             tar_pos.rx()-=1;
             if (checkWall(tar_pos)) {
                 emit robotMoved(tar_pos);
-                checkPoint();
             }
             break;
         }
@@ -255,7 +278,6 @@ void Controller::moveRobot(){
             tar_pos.rx()+=1;
             if (checkWall(tar_pos)) {
                 emit robotMoved(tar_pos);
-                checkPoint();
             }
             break;
         }
@@ -263,7 +285,7 @@ void Controller::moveRobot(){
             tar_pos.ry()-=1;
             if (checkWall(tar_pos)) {
                 emit robotMoved(tar_pos);
-                checkPoint();
+                checkPoints();
             }
             break;
         }
@@ -271,30 +293,59 @@ void Controller::moveRobot(){
             tar_pos.ry()+=1;
             if (checkWall(tar_pos)) {
                 emit robotMoved(tar_pos);
-                checkPoint();
             }
             break;
         }
         default: break;
     }
 
-    for(auto &p:QVector<QPoint>{
-        QPoint{pos.rx()+1,pos.ry()},
-        QPoint{pos.rx()-1,pos.ry()},
-        QPoint{pos.rx(),pos.ry()+1},
-        QPoint{pos.rx(),pos.ry()-1}
-        }){
-        if(!(m_mazeModel.tmpWalls.contains(p)||m_mazeModel.walls.contains(p)||m_robotModel.way.contains(p))) return;
+    if(!solver) {
+        if (checkTarget()) emit levelDone(true);
+        else {
+            checkPoints();
+
+            for (auto &p: QVector<QPoint>{
+                    QPoint{pos.rx() + 1, pos.ry()},
+                    QPoint{pos.rx() - 1, pos.ry()},
+                    QPoint{pos.rx(), pos.ry() + 1},
+                    QPoint{pos.rx(), pos.ry() - 1}
+            }) {
+                if (!(m_mazeModel.tmpWalls.contains(p) || m_mazeModel.walls.contains(p) ||
+                      m_robotModel.way.contains(p)))
+                    return;
+            }
+            emit levelDone(false);
+        }
     }
-    emit levelDone(false);
 #undef pos
 }
 
 
-void Controller::exit()
-{
+void Controller::exit(){
    writeHighscore();
    emit returnClicked(Menu::END_GAME);
+}
+
+bool Controller::checkTarget() {
+    if(m_robotModel.robotPosition == m_robotModel.startPosition){
+        bool success = true;
+        for(auto &w:m_mazeModel.whitePoints){
+            if(!m_robotModel.way.contains(w)) {
+                success=false;
+                break;
+            }
+        }
+        if(success){
+            for(auto &b:m_mazeModel.blackPoints){
+                if(!m_robotModel.way.contains(b)){
+                    success = false;
+                    break;
+                }
+            }
+        }
+        return success;
+    }
+    return false;
 }
 
 

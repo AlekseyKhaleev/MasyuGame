@@ -37,7 +37,7 @@ public:
     ~Controller() override;
 
 private:
-
+    QStack<QPoint> m_trueWay;
     bool m_scoreIncrease;
     QTimer m_animationTimer;
     Robot::Model m_robotModel;
@@ -46,8 +46,15 @@ private:
     [[nodiscard]] bool checkWall(QPoint dest) const;
     [[nodiscard]] int updateScore() const;
 
-    void moveRobot();
-    void checkPoint();
+    void moveRobot(bool solver=false);
+    void checkPoints();
+    bool checkTarget();
+
+    bool solve();
+
+    QSet<QPoint> getNeighbours();
+
+    void rotate(QPoint dest);
 };
 
 
